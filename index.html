@@ -71,7 +71,7 @@
         let y = 60 - height;
         let color = calcColor(1, 10, barNo);
        //Hvis vi går gjennom nummer får vi feil, når vi legger nye stolper som er samme numre, derfor bruker vi array index nummber...
-        let border = styles[barNo-1].border;
+        let border = styles[barNo-1]?.border;
         return `<rect  
             style='${border ? "stroke-width:.5;stroke:black" : null} '
                 width="${width}" height="${height}"
@@ -89,26 +89,36 @@
         return colString;
       }
 
+const addNewElementInArray=(arr,element)=>{
+  let result=[...arr,element];
+  return result;
+}
+
+const setIdInOrderInStyles=()=>{
+  return styles.map((item,index)=>item={id:index+1,number:item.number,border:item.border});
+}
+
       // controller (ingenting her ennå)--
       function legStolpe(event) {
           //initial value=0 and typeof number
         let value = Number(event.target.previousElementSibling.value);
-           //for å legge til uniq id, satte vi først en id verdi som er max og vi øker  1 etter 1, hvis vi setter id etter array.length,  får vi problem når vi fjerner en stolpe som er f.ex indexNo:2,... 
            console.log("valueFirst: ",value); 
       if(validate(value)){//initialvalue=0; hvis man legger ingenting in inputbox, får vi også feilmelding,og validate return false
            //numbers.push(Number(value));
-        numbers = [...numbers, value]; 
+        numbers = addNewElementInArray(numbers,value); 
+        console.log("numbers: ",numbers);
         //Hvergang vi legger til en ny stolpe ordner vi sette ideene  etter rekkefølge som 1,2,3,4 for å bruke id en som inputValue
-        styles=styles.map((item,index)=>item={id:index+1,number:item.number,border:item.border});
+        styles=setIdInOrderInStyles();
     //styles.push({id:maxId,number:value,border:false})
-    styles = [...styles, {id:styles.length+1,number:value,border:false}];
-    //Hvis ingen stolpe som er valgt, får vi ikke feil
+    styles=addNewElementInArray(styles,{id:styles.length+1,number:value,border:false});
+    console.log("styles::: ",styles);
+    //Hvis ingen stolpe som er valgt, får vi ikke feil ved hjelp av ?
    inputValue=chosenBar?.id;
       }else{
         alert("Ugylid nummer! legg inn et nytt gyldig nummer");
         value="";
       }
-     //hvis vi ikke har valgt en stolpe, får vi feil, derfor bruker vi ?...betyr hvis chosenBar object ikke har en property som heter nummer, stopp og ikke gå videre for ikke få feilmelding.
+
      show();
        }
 
@@ -135,33 +145,43 @@
       }
 
 
+const removeAnObjectInArray=(arr,element)=>{
+  let result=arr.filter(item=>item.id!==element.id);
+  return result;
+}
+
+const removeAnItemInArray=(arr,indexNumber)=>{
+  let result=arr.filter((item,index)=>index!==indexNumber);
+  return result;
+}
+
+
       function fjerneStolpe() {
         //hvis den stolpen som er valgt,skal vi fjerne
-        let index=styles.indexOf(chosenBar);
+        let indexNumber=styles.indexOf(chosenBar);
         if (chosenBar.border) {//Hvis border true, betyr den stolpen som er valgt
-       //numbers = numbers.filter((number) => number !== chosenBar.number); Vi kan ikke gjøre den fordi når vi legger til nye stolper som er samme nummer, fjernes de som er samme numre
-       numbers.splice(index,1);//Vi fjerner specific item i array
-       //Det går an ved å bruke  styles array fordi vi går gjennom uniq id...
+// numbers.splice(indexNumber,1);//Vi fjerner specific item i array
+    numbers=  removeAnItemInArray(numbers,indexNumber);
        // //Hvergang vi fjerner en ny stolpe ordner vi  ideene etter rekkefølge som 1,2,3,4 for å bruke id en som inputValue  
-         styles = styles.filter((style) => style.id !== chosenBar.id);
-         styles=styles.map((item,index)=>item={id:index+1,number:item.number,border:item.border});
+         styles = removeAnObjectInArray(styles,chosenBar);
+         styles=setIdInOrderInStyles();
         }
         chosenBar = "";
         show();
       }
 
+const setAllBarBorderFalseExceptSelectedBar=(arr,selectedBar)=>{
+  let result=arr.map(item=>item.id!==selectedBar.id ? {id:item.id,number:item.number, border:false} : item
+);
 
+  return result;
+}
       function valgStolpe(barNo, number) {
         //Det går ikke hvis vi bruker nummer for å få valgt stolpe, når vi får nye stolper som er samme numre, blir valgt de som er samme numre...
        // chosenBar = styles.find((style) => style.number === number);
        let index=barNo-1;
         chosenBar=styles[index];
-        //Vi gjør de stolpene som ikke er valgt sin border false, slik at bare den stolpen som er border:true blir valgt...
-        styles = styles.map((style) =>
-          style.id !== chosenBar.id
-            ? { id: style.id, number: style.number, border: false }
-            : style
-        );
+        styles=setAllBarBorderFalseExceptSelectedBar(styles,chosenBar);
         chosenBar.border = !chosenBar.border;//Vi gir mulighet til å gjøre motsatt
         //inputValue = chosenBar?.id;     
         inputValue = barNo;        
