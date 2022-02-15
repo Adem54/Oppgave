@@ -104,6 +104,7 @@ const setIdInOrderInStyles=()=>{
            console.log("valueFirst: ",value); 
       if(validate(value)){//initialvalue=0; hvis man legger ingenting in inputbox, får vi også feilmelding,og validate return false
            //numbers.push(Number(value));
+           console.log("valueFirstTTTTTTTT: ",value); 
         numbers = addNewElementInArray(numbers,value); 
         console.log("numbers: ",numbers);
         //Hvergang vi legger til en ny stolpe ordner vi sette ideene  etter rekkefølge som 1,2,3,4 for å bruke id en som inputValue
@@ -113,9 +114,14 @@ const setIdInOrderInStyles=()=>{
     console.log("styles::: ",styles);
     //Hvis ingen stolpe som er valgt, får vi ikke feil ved hjelp av ?
    inputValue=chosenBar?.id;
+
       }else{
+        
         alert("Ugylid nummer! legg inn et nytt gyldig nummer");
         value="";
+        inputValue=chosenBar?.id;
+        
+     
       }
 
      show();
